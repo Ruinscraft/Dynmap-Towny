@@ -88,6 +88,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		int strokecolor;
 		double strokeopacity;
 		int strokeweight;
+		int publicstrokecolor;
+		double publicstrokeopacity;
+		int publicstrokeweight;
 		int fillcolor;
 		double fillopacity;
 		int pvpfillcolor;
@@ -107,6 +110,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			String sc = cfg.getString(path+".strokeColor", null);
 			strokeopacity = cfg.getDouble(path+".strokeOpacity", -1);
 			strokeweight = cfg.getInt(path+".strokeWeight", -1);
+			String psc = cfg.getString(path+".publicStrokeColor", null);
+			publicstrokeopacity = cfg.getDouble(path+".publicStrokeOpacity", -1);
+			publicstrokeweight = cfg.getInt(path+".publicStrokeWeight", -1);
 			String fc = cfg.getString(path+".fillColor", null);
 			String pfc = cfg.getString(path+".pvpFillColor", null);
 			String fcs = cfg.getString(path+".fillColorShops", null);
@@ -125,6 +131,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			try {
 				if(sc != null)
 					strokecolor = Integer.parseInt(sc.substring(1), 16);
+				if(psc != null)
+					publicstrokecolor = Integer.parseInt(psc.substring(1), 16);
 				if(pfc != null)
 					pvpfillcolor = Integer.parseInt(pfc.substring(1), 16);
 				if(fc != null)
@@ -187,6 +195,36 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				return nat.strokeweight;
 			else if(strokeweight >= 0)
 				return strokeweight;
+			else
+				return 3;
+		}
+		public int getPublicStrokeColor(AreaStyle cust, AreaStyle nat) {
+			if((cust != null) && (cust.publicstrokecolor >= 0))
+				return cust.publicstrokecolor;
+			else if((nat != null) && (nat.publicstrokecolor >= 0))
+				return nat.publicstrokecolor;
+			else if(publicstrokecolor >= 0)
+				return publicstrokecolor;
+			else
+				return 0xFF0000;
+		}
+		public double getPublicStrokeOpacity(AreaStyle cust, AreaStyle nat) {
+			if((cust != null) && (cust.publicstrokeopacity >= 0))
+				return cust.publicstrokeopacity;
+			else if((nat != null) && (nat.publicstrokeopacity >= 0))
+				return nat.publicstrokeopacity;
+			else if(publicstrokeopacity >= 0)
+				return publicstrokeopacity;
+			else
+				return 0.8;
+		}
+		public int getPublicStrokeWeight(AreaStyle cust, AreaStyle nat) {
+			if((cust != null) && (cust.publicstrokeweight >= 0))
+				return cust.publicstrokeweight;
+			else if((nat != null) && (nat.publicstrokeweight >= 0))
+				return nat.publicstrokeweight;
+			else if(publicstrokeweight >= 0)
+				return publicstrokeweight;
 			else
 				return 3;
 		}
@@ -443,8 +481,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			try {
 				nation = town.getNation().getName();
 			} catch (Exception e) { nation = ""; }
-			v = v.replace("%regionname%", "<img src=\"testing.jpg\" alt=\"Image\">" + 
-					town.getName() + " (" + nation + ")");
+			v = v.replace("%regionname%", "<img src=\"testing.jpg\" alt=\"Image\"> " + 
+					town.getName() + "<br /> " + nation);
 		} else {
 			v = v.replace("%regionname%", town.getName());
 		}
@@ -489,7 +527,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
 
 		if (btype == null) {
-			m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
+			if (town.isPublic()) {
+				m.setLineStyle(defstyle.getPublicStrokeWeight(as, ns), defstyle.getPublicStrokeOpacity(as, ns), defstyle.getPublicStrokeColor(as, ns));
+			} else {
+				m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
+			}
 		} else {
 			m.setLineStyle(1, 0, 0);
 		}
