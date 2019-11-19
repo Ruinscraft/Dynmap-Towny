@@ -94,6 +94,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		int publicstrokecolor;
 		double publicstrokeopacity;
 		int publicstrokeweight;
+		int lonestrokecolor;
+		double lonestrokeopacity;
+		int lonestrokeweight;
 		int fillcolor;
 		double fillopacity;
 		int pvpfillcolor;
@@ -116,6 +119,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			String psc = cfg.getString(path+".publicStrokeColor", null);
 			publicstrokeopacity = cfg.getDouble(path+".publicStrokeOpacity", -1);
 			publicstrokeweight = cfg.getInt(path+".publicStrokeWeight", -1);
+			String lsc = cfg.getString(path+".loneStrokeColor", null);
+			lonestrokeopacity = cfg.getDouble(path+".loneStrokeOpacity", -1);
+			lonestrokeweight = cfg.getInt(path+".loneStrokeWeight", -1);
 			String fc = cfg.getString(path+".fillColor", null);
 			String pfc = cfg.getString(path+".pvpFillColor", null);
 			String fcs = cfg.getString(path+".fillColorShops", null);
@@ -136,6 +142,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 					strokecolor = Integer.parseInt(sc.substring(1), 16);
 				if(psc != null)
 					publicstrokecolor = Integer.parseInt(psc.substring(1), 16);
+				if(lsc != null)
+					lonestrokecolor = Integer.parseInt(lsc.substring(1), 16);
 				if(pfc != null)
 					pvpfillcolor = Integer.parseInt(pfc.substring(1), 16);
 				if(fc != null)
@@ -228,6 +236,36 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				return nat.publicstrokeweight;
 			else if(publicstrokeweight >= 0)
 				return publicstrokeweight;
+			else
+				return 3;
+		}
+		public int getLoneStrokeColor(AreaStyle cust, AreaStyle nat) {
+			if((cust != null) && (cust.lonestrokecolor >= 0))
+				return cust.lonestrokecolor;
+			else if((nat != null) && (nat.lonestrokecolor >= 0))
+				return nat.lonestrokecolor;
+			else if(lonestrokecolor >= 0)
+				return lonestrokecolor;
+			else
+				return 0xFF0000;
+		}
+		public double getLoneStrokeOpacity(AreaStyle cust, AreaStyle nat) {
+			if((cust != null) && (cust.lonestrokeopacity >= 0))
+				return cust.lonestrokeopacity;
+			else if((nat != null) && (nat.lonestrokeopacity >= 0))
+				return nat.lonestrokeopacity;
+			else if(lonestrokeopacity >= 0)
+				return lonestrokeopacity;
+			else
+				return 0.8;
+		}
+		public int getLoneStrokeWeight(AreaStyle cust, AreaStyle nat) {
+			if((cust != null) && (cust.lonestrokeweight >= 0))
+				return cust.lonestrokeweight;
+			else if((nat != null) && (nat.lonestrokeweight >= 0))
+				return nat.lonestrokeweight;
+			else if(lonestrokeweight >= 0)
+				return lonestrokeweight;
 			else
 				return 3;
 		}
@@ -574,18 +612,23 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
 
 		if (btype == null) {
-			if (town.isPublic()) {
-				m.setLineStyle(defstyle.getPublicStrokeWeight(as, ns), defstyle.getPublicStrokeOpacity(as, ns), defstyle.getPublicStrokeColor(as, ns));
+			if (town.hasNation()) {
+				m.setLineStyle(defstyle.getLoneStrokeWeight(null, null), 
+						defstyle.getLoneStrokeOpacity(null, null), defstyle.getLoneStrokeColor(null, null));
+			} else if (town.isPublic()) {
+				m.setLineStyle(defstyle.getPublicStrokeWeight(null, null), 
+						defstyle.getPublicStrokeOpacity(null, null), defstyle.getPublicStrokeColor(null, null));
 			} else {
-				m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
+				m.setLineStyle(defstyle.getStrokeWeight(null, null), 
+						defstyle.getStrokeOpacity(null, null), defstyle.getStrokeColor(null, null));
 			}
 		} else {
 			m.setLineStyle(1, 0, 0);
 		}
 		if (town.isPVP()) {
-			m.setFillStyle(defstyle.getPVPFillOpacity(as, ns), defstyle.getPVPFillColor(as, ns, btype));
+			m.setFillStyle(defstyle.getPVPFillOpacity(null, null), defstyle.getPVPFillColor(null, null, btype));
 		} else {
-			m.setFillStyle(defstyle.getFillOpacity(as, ns), defstyle.getFillColor(as, ns, btype));
+			m.setFillStyle(defstyle.getFillOpacity(null, null), defstyle.getFillColor(null, null, btype));
 		}
 		double y = defstyle.getY(as, ns);
 		m.setRangeY(y, y);
@@ -742,7 +785,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				int init_z = minz;
 				int cur_x = minx;
 				int cur_z = minz;
-				System.out.println("AHHHH" + init_x + " " + init_z);
 				direction dir = direction.XPLUS;
 				List<int[]> linelist = new ArrayList<int[]>();
 				linelist.add(new int[] { init_x, init_z } ); // Add start point
