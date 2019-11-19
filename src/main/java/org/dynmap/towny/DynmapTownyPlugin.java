@@ -2,6 +2,7 @@ package org.dynmap.towny;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,8 +32,10 @@ import org.dynmap.markers.MarkerAPI;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.PlayerSet;
+import org.dynmap.markers.PolyLineMarker;
 
 import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Coord;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -479,32 +482,76 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		if(town.hasNation()) {
 			String nation;
 			try {
-				nation = town.getNation().getName();
+				nation = town.getNation().getFormattedName().replace(" (Nation)", "");
+				nation = embolden(nation, town.getNation().getName().replace("_", " "));
 			} catch (Exception e) { nation = ""; }
-			v = v.replace("%regionname%", "<img src=\"testing.jpg\" alt=\"Image\"> " + 
-					town.getName() + "<br /> " + nation);
+			v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
+					"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span> <br />"
+					+ "<span style=\"font-size:120%;\"><img src=\"tiles/_markers_/crown.png\" title=\"Nation\" alt=\"Nation\"> " 
+					+ nation + "</span>");
 		} else {
-			v = v.replace("%regionname%", town.getName());
+			v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
+					"<img src=\"tiles/_markers_/greendotlarge.png\" alt=\"Image\"> " + town.getName() + "</span>");
 		}
-		v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
+		v = v.replace("%board%", town.getTownBoard());
+
+		if (town.hasMayor()) {
+			String formatted = town.getMayor().getFormattedName();
+			formatted = embolden(formatted, town.getMayor().getName());
+			v = v.replace("%playerowners%", formatted);
+		} else {
+			v = v.replace("%playerowners%", "");
+		}
+
 		String res = "";
+		int resLeft = town.getResidents().size();
 		for(Resident r : town.getResidents()) {
 			if(res.length()>0) res += ", ";
+			if (res.length() > 200) {
+				res += "and " + resLeft + " more";
+				break;
+			}
+			resLeft--;
 			res += r.getName();
 		}
 		v = v.replace("%playermembers%", res);
 		String mgrs = "";
+		int mgrsLeft = town.getAssistants().size();
 		for(Resident r : town.getAssistants()) {
-			if(mgrs.length()>0) mgrs += ", ";
+			if(mgrs.length() > 0) mgrs += ", ";
+			if (mgrs.length() > 200) {
+				mgrs += "and " + mgrsLeft + " more";
+				break;
+			}
+			mgrsLeft--;
 			mgrs += r.getName();
 		}
 		v = v.replace("%playermanagers%", res);
 
 		/* Build flags */
-		String flgs = "pvp: " + town.isPVP();
-		flgs += "<br/>public: " + town.isPublic();
+		String flgs;
+		if (town.isPVP()) {
+			flgs = "Safe: <img src=\"images/disagree.png\" title=\"No\" alt=\"No\">";
+		} else {
+			flgs = "Safe: <img src=\"images/agree.png\" title=\"Yes\" alt=\"Yes\">";
+		}
+		if (town.isPublic()) {
+			flgs += "  Public: <img src=\"images/agree.png\" title=\"Enabled\" alt=\"Enabled\">";
+		} else {
+			flgs += "  Public: <img src=\"images/disagree.png\" title=\"Disabled\" alt=\"Disabled\">";
+		}
+		if (town.hasMobs()) {
+			flgs += "  Mobs: <img src=\"images/agree.png\" title=\"Enabled\" alt=\"Enabled\">";
+		} else {
+			flgs += "  Mobs: <img src=\"images/disagree.png\" title=\"Disabled\" alt=\"Disabled\">";
+		}
 		v = v.replace("%flags%", flgs);
+
 		return v;
+	}
+
+	public String embolden(String original, String toBolden) {
+		return original.replace(toBolden, "<b>" + toBolden + "</b>");
 	}
 
 	private boolean isVisible(String id, String worldname) {
@@ -641,6 +688,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			TileFlags ourblks = null;
 			int minx = Integer.MAX_VALUE;
 			int minz = Integer.MAX_VALUE;
+			int maxx = Integer.MIN_VALUE;
+			int maxz = Integer.MIN_VALUE;
 			for(TownBlock node : nodevals) {
 				int nodex = node.getX();
 				int nodez = node.getZ();
@@ -659,14 +708,19 @@ public class DynmapTownyPlugin extends JavaPlugin {
 					minx = nodex; minz = nodez;
 				}
 				/* If shape found, and we're in it, add to our node list */
-				else if((ourblks != null) && (node.getWorld() == curworld) &&
+				else if ((ourblks != null) && (node.getWorld() == curworld) &&
 						(ourblks.getFlag(nodex, nodez))) {
 					ournodes.add(node);
-					if(nodex < minx) {
+
+					if (nodex < minx) {
 						minx = nodex; minz = nodez;
-					}
-					else if((nodex == minx) && (nodez < minz)) {
+					} else if ((nodex == minx) && (nodez < minz)) {
 						minz = nodez;
+					}
+					if (nodex > maxx) { 
+						maxx = nodex;
+					} else if (nodez > maxz) {
+						maxz = nodez;
 					}
 				}
 				else {  /* Else, keep it in the list for the next polygon */
@@ -674,6 +728,13 @@ public class DynmapTownyPlugin extends JavaPlugin {
 					newlist.add(node);
 				}
 			}
+
+			for (int startx = minx; startx <= maxx; startx++) {
+				for (int startz = minz; startz <= maxz; startz++) {
+
+				}
+			}
+
 			nodevals = newlist; /* Replace list (null if no more to process) */
 			if(ourblks != null) {
 				/* Trace outline of blocks - start from minx, minz going to x+ */
@@ -681,9 +742,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				int init_z = minz;
 				int cur_x = minx;
 				int cur_z = minz;
+				System.out.println("AHHHH" + init_x + " " + init_z);
 				direction dir = direction.XPLUS;
-				ArrayList<int[]> linelist = new ArrayList<int[]>();
+				List<int[]> linelist = new ArrayList<int[]>();
 				linelist.add(new int[] { init_x, init_z } ); // Add start point
+
 				while((cur_x != init_x) || (cur_z != init_z) || (dir != direction.ZMINUS)) {
 					switch(dir) {
 					case XPLUS: /* Segment in X+ direction */
@@ -744,6 +807,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 						break;
 					}
 				}
+
 				/* Build information for specific area */
 				String polyid = town.getName() + "__" + poly_index;
 				if(btype != null) {
@@ -816,6 +880,37 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				}
 			}
 		}
+	}
+
+	public boolean adjTownBlock(TownyWorld world, int x, int z) {
+		try {
+			world.getTownBlock(x - 1, z);
+		} catch (NotRegisteredException e) {
+			try {
+				world.getTownBlock(x + 1, z);
+			} catch (NotRegisteredException ee) {
+				try {
+					world.getTownBlock(x, z + 1);
+				} catch (NotRegisteredException eee) {
+					try {
+						world.getTownBlock(x, z - 1);
+					} catch (NotRegisteredException eeee) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	public TownBlock getBlockAt(int x, int z, Collection<TownBlock> blocks) {
+		for (TownBlock block : blocks) {
+			if (block.getCoord().getX() == x &&
+					block.getCoord().getZ() == z) {
+				return block;
+			}
+		}
+		return null;
 	}
 
 	/* Update Towny information */
