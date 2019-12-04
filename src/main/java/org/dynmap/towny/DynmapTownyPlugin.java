@@ -32,7 +32,6 @@ import org.dynmap.markers.MarkerAPI;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.PlayerSet;
-import org.dynmap.markers.PolyLineMarker;
 
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
@@ -898,7 +897,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			/* Now, add marker for home block */
 			TownBlock blk = null;
 			try {
-				blk = town.getHomeBlock();
+				if (town.hasHomeBlock()) {
+					blk = town.getHomeBlock();
+				} else {
+					blk = town.getTownBlocks().get(0);
+				}
 			} catch(Exception ex) {
 				severe("getHomeBlock exception " + ex);
 			}

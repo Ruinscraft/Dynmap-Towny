@@ -14,7 +14,6 @@ public class TileFlags {
 	private HashMap<Long, long[]> chunkmap = new HashMap<Long, long[]>(); 
 	private long last_key = Long.MAX_VALUE;
 	private long[] last_row;
-	private boolean empty;
 	
 	public TileFlags() {
 	}
@@ -59,10 +58,6 @@ public class TileFlags {
 			if(row != null)
 				row[y & 0x3F] &= ~(1L << (x & 0x3F));
 		}
-	}
-	
-	public void setEmpty(boolean empty) {
-		this.empty = empty;
 	}
 
 	public void clear() {
