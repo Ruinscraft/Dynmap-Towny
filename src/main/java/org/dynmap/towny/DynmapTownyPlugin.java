@@ -542,7 +542,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		}
 
 		String res = "";
-		int resLeft = town.getResidents().size();
+		int playerAmount = town.getResidents().size();
+		int resLeft = playerAmount;
 		for(Resident r : town.getResidents()) {
 			if(res.length()>0) res += ", ";
 			if (res.length() > 200) {
@@ -552,13 +553,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			resLeft--;
 			res += r.getName();
 		}
+		v = v.replace("%playeramount%",  "" + playerAmount);
 		v = v.replace("%playermembers%", res);
+
 		String mgrs = "";
 		int mgrsLeft = town.getAssistants().size();
 		for(Resident r : town.getAssistants()) {
 			if(mgrs.length() > 0) mgrs += ", ";
 			if (mgrs.length() > 200) {
-				mgrs += "and " + mgrsLeft + " more";
+				mgrs += "and " + mgrsLeft + " more...";
 				break;
 			}
 			mgrsLeft--;
@@ -612,15 +615,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
 
 		if (btype == null) {
-			if (town.hasNation()) {
-				m.setLineStyle(defstyle.getLoneStrokeWeight(null, null), 
-						defstyle.getLoneStrokeOpacity(null, null), defstyle.getLoneStrokeColor(null, null));
-			} else if (town.isPublic()) {
-				m.setLineStyle(defstyle.getPublicStrokeWeight(null, null), 
-						defstyle.getPublicStrokeOpacity(null, null), defstyle.getPublicStrokeColor(null, null));
-			} else {
+			if (!town.isPublic()) {
 				m.setLineStyle(defstyle.getStrokeWeight(null, null), 
 						defstyle.getStrokeOpacity(null, null), defstyle.getStrokeColor(null, null));
+			} else if (town.hasNation()) {
+				m.setLineStyle(defstyle.getLoneStrokeWeight(null, null), 
+						defstyle.getLoneStrokeOpacity(null, null), defstyle.getLoneStrokeColor(null, null));
+			} else {
+				m.setLineStyle(defstyle.getPublicStrokeWeight(null, null), 
+						defstyle.getPublicStrokeOpacity(null, null), defstyle.getPublicStrokeColor(null, null));
 			}
 		} else {
 			m.setLineStyle(1, 0, 0);
