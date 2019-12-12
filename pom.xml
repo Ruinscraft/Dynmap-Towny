@@ -47,6 +47,10 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+		<repository>
+			<id>github-Towny</id>
+			<url>https://maven.pkg.github.com/TownyAdvanced/Towny/packages/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -64,9 +68,8 @@
 		<dependency>
 			<groupId>com.palmergames.bukkit.towny</groupId>
 			<artifactId>Towny</artifactId>
-			<version>0.93.1.0 Pre-Release 4</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/deps/Towny.jar</systemPath>
+			<version>0.95.0.5</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.palmergames</groupId>
