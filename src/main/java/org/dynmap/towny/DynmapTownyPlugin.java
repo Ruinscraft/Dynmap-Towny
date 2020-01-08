@@ -523,10 +523,16 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				nation = town.getNation().getFormattedName().replace(" (Nation)", "");
 				nation = embolden(nation, town.getNation().getName().replace("_", " "));
 			} catch (Exception e) { nation = ""; }
-			v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
-					"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span> <br />"
-					+ "<span style=\"font-size:120%;\"><img src=\"tiles/_markers_/crown.png\" title=\"Nation\" alt=\"Nation\"> " 
-					+ nation + "</span>");
+			if (town.isCapital()) {
+				v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
+						"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span> <br />"
+						+ "<span style=\"font-size:120%;\"><img src=\"tiles/_markers_/crown.png\" title=\"Nation\" alt=\"Nation\"> " 
+						+ nation + "</span>");
+			} else {
+				v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
+						"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span> <br />"
+						+ "<span style=\"font-size:120%;\">" + nation + "</span>");
+			}
 		} else {
 			v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
 					"<img src=\"tiles/_markers_/greendotlarge.png\" alt=\"Image\"> " + town.getName() + "</span>");

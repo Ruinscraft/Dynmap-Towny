@@ -4,9 +4,6 @@
 /.settings
 /.vscode
 
-#dependencies
-/deps
-
 # netbeans
 /nbproject
 
