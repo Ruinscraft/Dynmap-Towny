@@ -562,7 +562,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		if (res.length() > 200) {
 			String mgrsTooltip = "";
 			for (int i = town.getAssistants().size() - resLeft; i < town.getAssistants().size(); i++) {
-				mgrsTooltip = town.getAssistants().get(i).getName();
+				mgrsTooltip += town.getAssistants().get(i).getName();
+				if (i != town.getAssistants().size() - 1) mgrsTooltip += ", ";
 			}
 			res += "<div title=\"" + mgrsTooltip + "\">and " + resLeft + " more...</div>";
 		}
