@@ -559,20 +559,29 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			resLeft--;
 			res += r.getName();
 		}
+		if (res.length() > 200) {
+			String mgrsTooltip = "";
+			for (int i = town.getAssistants().size() - resLeft; i < town.getAssistants().size(); i++) {
+				mgrsTooltip = town.getAssistants().get(i).getName();
+			}
+			res += "<div title=\"" + mgrsTooltip + "\">and " + resLeft + " more...</div>";
+		}
 		v = v.replace("%playeramount%",  "" + playerAmount);
 		v = v.replace("%playermembers%", res);
 
+		// unused
 		String mgrs = "";
 		int mgrsLeft = town.getAssistants().size();
 		for(Resident r : town.getAssistants()) {
 			if(mgrs.length() > 0) mgrs += ", ";
 			if (mgrs.length() > 200) {
-				mgrs += "and " + mgrsLeft + " more...";
+				mgrs += "<div title=\"users\">and " + mgrsLeft + " more...</div>";
 				break;
 			}
 			mgrsLeft--;
 			mgrs += r.getName();
 		}
+
 		v = v.replace("%playermanagers%", res);
 
 		/* Build flags */

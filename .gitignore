@@ -1,26 +1,43 @@
 # Eclipse stuff
-/.classpath
-/.project
-/.settings
-/.vscode
+.classpath
+.project
+.settings/
 
 # netbeans
-/nbproject
+nbproject/
+nbactions.xml
 
 # we use maven!
-/build.xml
+build.xml
 
 # maven
-/target
+target/
+dependency-reduced-pom.xml
+
+# gradle
+.gradle/
 
 # vim
 .*.sw[a-p]
 
 # various other potential build files
-/build
-/bin
-/dist
-/manifest.mf
+build/
+bin/
+out/
+dist/
+manifest.mf
 
 # Mac filesystem dust
-/.DS_Store
+.DS_Store/
+
+# intellij
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# other files
+*.log*
+
+# delombok
+*/src/main/lombok
