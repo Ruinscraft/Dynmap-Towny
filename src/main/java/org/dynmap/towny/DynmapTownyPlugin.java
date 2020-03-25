@@ -553,7 +553,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		for(Resident r : town.getResidents()) {
 			if(res.length()>0) res += ", ";
 			if (res.length() > 200) {
-				res += "and " + resLeft + " more";
 				break;
 			}
 			resLeft--;
@@ -561,11 +560,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		}
 		if (res.length() > 200) {
 			String mgrsTooltip = "";
-			for (int i = town.getAssistants().size() - resLeft; i < town.getAssistants().size(); i++) {
-				mgrsTooltip += town.getAssistants().get(i).getName();
-				if (i != town.getAssistants().size() - 1) mgrsTooltip += ", ";
+			for (int i = playerAmount - resLeft; i < playerAmount; i++) {
+				mgrsTooltip += town.getResidents().get(i).getName();
+				if (i != town.getResidents().size() - 1) mgrsTooltip += ", ";
 			}
-			res += "<div title=\"" + mgrsTooltip + "\">and " + resLeft + " more...</div>";
+			res += "<span title=\"" + mgrsTooltip + "\">and " + resLeft + " more...</span>";
 		}
 		v = v.replace("%playeramount%",  "" + playerAmount);
 		v = v.replace("%playermembers%", res);
