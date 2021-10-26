@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.exceptions.EconomyException;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -526,8 +527,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			} catch (Exception e) { nation = ""; }
 			if (town.isCapital()) {
 				v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
-						"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span>" +
-						"<span style=\"font-size:50%;\">" + town.getHoldingBalance() + " <br />"
+						"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span> <br />"
 						+ "<span style=\"font-size:120%;\"><img src=\"tiles/_markers_/crown.png\" title=\"Nation\" alt=\"Nation\"> " 
 						+ nation + "</span>");
 			} else {
@@ -540,6 +540,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
 					"<img src=\"tiles/_markers_/greendotlarge.png\" alt=\"Image\"> " + town.getName() + "</span>");
 		}
 		v = v.replace("%board%", town.getTownBoard());
+		// vertical align below is just because the image is weird
+		String bal = TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance());
+		bal = bal.replace(" gold ingots", "");
+		v = v.replace("%balance%", "<img src=\"tiles/_markers_/goldicon.png\" style=\"vertical-align:-10%\" alt=\"Image\"> " + bal);
 
 		if (town.hasMayor()) {
 			String formatted = town.getMayor().getFormattedName();
@@ -709,8 +713,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		double[] z = null;
 		int poly_index = 0; /* Index of polygon for given town */
 
+		if (town == null) {
+			return;
+		}
 		/* Handle areas */
-		List<TownBlock> blocks = town.getTownBlocks();
+		Collection<TownBlock> blocks = town.getTownBlocks();
 		if(blocks.isEmpty())
 			return;
 		/* Build popup */
@@ -920,11 +927,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			/* Now, add marker for home block */
 			TownBlock blk = null;
 			try {
-				if (town.hasHomeBlock()) {
-					blk = town.getHomeBlock();
-				} else {
-					blk = town.getTownBlocks().get(0);
-				}
+				blk = town.getHomeBlock();
 			} catch(Exception ex) {
 				severe("getHomeBlock exception " + ex);
 			}

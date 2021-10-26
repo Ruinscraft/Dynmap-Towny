@@ -27,7 +27,7 @@ visibility-by-town: true
 visibility-by-nation: true
 
 # Format for popup - substitute values for macros
-infowindow: '<div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>'
+infowindow: '<div class="infowindow">%regionname%<br /><span style="font-size:80%;"><i>"%board%"</i></span><span style="font-size:50%;"><i>%balance%</i></span><br/> %playerowners%<br /> Residents (%playeramount%) <span style="font-weight:bold;">%playermanagers%</span><br/><span style="font-weight:bold;">%flags%</span></div>'
 
 regionstyle:
   strokeColor: "#FF0000"
