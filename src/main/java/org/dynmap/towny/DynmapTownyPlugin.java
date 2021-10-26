@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.palmergames.bukkit.towny.exceptions.EconomyException;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -515,7 +516,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 	private Map<String, AreaMarker> resareas = new HashMap<String, AreaMarker>();
 	private Map<String, Marker> resmark = new HashMap<String, Marker>();
 
-	private String formatInfoWindow(Town town, TownBlockType btype) {
+	private String formatInfoWindow(Town town, TownBlockType btype) throws EconomyException {
 		String v = "<div class=\"regioninfo\">"+infowindow+"</div>";
 		if(town.hasNation()) {
 			String nation;
@@ -525,7 +526,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 			} catch (Exception e) { nation = ""; }
 			if (town.isCapital()) {
 				v = v.replace("%regionname%", "<span style=\"font-size:150%; font-weight:bold;\">" + 
-						"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span> <br />"
+						"<img src=\"tiles/_markers_/bluedotlarge.png\" title=\"Town\" alt=\"Town\"> " + town.getName() + "</span>" +
+						"<span style=\"font-size:50%;\">" + town.getHoldingBalance() + " <br />"
 						+ "<span style=\"font-size:120%;\"><img src=\"tiles/_markers_/crown.png\" title=\"Nation\" alt=\"Nation\"> " 
 						+ nation + "</span>");
 			} else {
@@ -712,7 +714,12 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		if(blocks.isEmpty())
 			return;
 		/* Build popup */
-		String desc = formatInfoWindow(town, btype);
+		String desc = null;
+		try {
+			desc = formatInfoWindow(town, btype);
+		} catch (EconomyException e) {
+			e.printStackTrace();
+		}
 
 		HashMap<String, TileFlags> blkmaps = new HashMap<String, TileFlags>();
 		LinkedList<TownBlock> nodevals = new LinkedList<TownBlock>();
